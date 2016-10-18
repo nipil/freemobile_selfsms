@@ -1,0 +1,8 @@
+# must be located at ~/.sms.py.conf
+
+[auth]
+user = 12345678
+password = aBcDeFgHiJkLmN
+
+[service]
+url = https://smsapi.free-mobile.fr/sendmsg
