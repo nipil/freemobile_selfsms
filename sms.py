@@ -22,20 +22,22 @@ def activate_debug():
     http_client.HTTPConnection.debuglevel = 1
 
     # You must initialize logging, otherwise you'll not see debug output.
-    logging.basicConfig()
     logging.getLogger().setLevel(logging.DEBUG)
     requests_log = logging.getLogger("requests.packages.urllib3")
     requests_log.setLevel(logging.DEBUG)
     requests_log.propagate = True
 
 def parse_arguments():
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--log', help='choix du niveau de log', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL', 'EXCEPTION'], default='WARNING')
     return parser.parse_args()
 
-def main():
+def main(limit):
 
     args = parse_arguments()
+
+    logging.basicConfig()
 
     if args.log == 'DEBUG':
         activate_debug()
@@ -48,7 +50,10 @@ def main():
 
     url = config.get('service', 'url')
 
-    text = sys.stdin.read()
+    text = sys.stdin.read(limit)
+
+    if len(sys.stdin.read()) > 0:
+        logging.warn("Message envoyé, mais tronqué à %i caractères car trop long !" % limit)
 
     params = { "user": user, "pass": password, "msg": text.strip() }
 
@@ -68,7 +73,7 @@ def main():
 
 if __name__ == '__main__':
     try:
-        main()
+        main(999)
         sys.exit(0)
     except KeyboardInterrupt, SystemExit:
         pass
